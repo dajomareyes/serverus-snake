@@ -92,25 +92,69 @@ func HandleStart(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("START\n")
 }
 
+func removeMoveOption(possibleMoves *[]string, move string) {
+	moves := *possibleMoves
+	for i, m := range moves {
+		if m == move {
+			moves = append(moves[:i], moves[i+1:]...)
+		}
+	}
+	*possibleMoves = moves
+}
+
 // HandleMove is called for each turn of each game.
 // Valid responses are "up", "down", "left", or "right".
 // TODO: Use the information in the GameRequest object to determine your next move.
 func HandleMove(w http.ResponseWriter, r *http.Request) {
+	// Receive request
 	request := GameRequest{}
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// Common variables that will be used throughout the function
+	boardWidth := request.Board.Width - 1
+	boardHeight := request.Board.Height - 1
+	headX := request.You.Head.X
+	headY := request.You.Head.Y
+	neckX := request.You.Body[1].X
+	neckY := request.You.Body[1].Y
+
 	// Choose a random direction to move in
 	possibleMoves := []string{"up", "down", "left", "right"}
-	move := possibleMoves[rand.Intn(len(possibleMoves))]
+	arrivedAtWall := headX == 0 || headX == boardWidth || headY == 0 || headY == boardHeight
+
+	move := ""
+	// Handle avoiding walls, then figure out how to handle corners
+	if arrivedAtWall {
+		// choose your next move
+		// process of elimination
+		// can I move up?
+		if headY+1 > boardHeight || headY+1 == neckY {
+			removeMoveOption(&possibleMoves, "up")
+		}
+		// can i move down?
+		if headY-1 < 0 || headY-1 == neckY {
+			removeMoveOption(&possibleMoves, "down")
+		}
+		// can i move left?
+		if headX-1 < 0 || headX-1 == neckX {
+			removeMoveOption(&possibleMoves, "left")
+		}
+		// can i move right?
+		if headX+1 > boardWidth || headX+1 == neckX {
+			removeMoveOption(&possibleMoves, "right")
+		}
+		move = possibleMoves[rand.Intn(len(possibleMoves))]
+	}
 
 	response := MoveResponse{
 		Move: move,
 	}
 
-	fmt.Printf("MOVE: %s\n", response.Move)
+	// Send response
+	fmt.Printf("TURN: %d MOVE: %s POSSIBLE_MOVES: %s NECK: %d,%d HEAD: %d,%d\n", request.Turn, response.Move, possibleMoves, neckX, neckY, headX, headY)
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
