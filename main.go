@@ -125,27 +125,24 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	possibleMoves := []string{"up", "down", "left", "right"}
 	arrivedAtWall := headX == 0 || headX == boardWidth || headY == 0 || headY == boardHeight
 
-	move := ""
+	move := "" // just go straight for now
+
 	// Handle avoiding walls, then figure out how to handle corners
 	if arrivedAtWall {
-		// choose your next move
-		// process of elimination
-		// can I move up?
+		// Use process of elimination to select move
 		if headY+1 > boardHeight || headY+1 == neckY {
 			removeMoveOption(&possibleMoves, "up")
 		}
-		// can i move down?
 		if headY-1 < 0 || headY-1 == neckY {
 			removeMoveOption(&possibleMoves, "down")
 		}
-		// can i move left?
 		if headX-1 < 0 || headX-1 == neckX {
 			removeMoveOption(&possibleMoves, "left")
 		}
-		// can i move right?
 		if headX+1 > boardWidth || headX+1 == neckX {
 			removeMoveOption(&possibleMoves, "right")
 		}
+		// Select only valid moves
 		move = possibleMoves[rand.Intn(len(possibleMoves))]
 	}
 
@@ -154,7 +151,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send response
-	fmt.Printf("TURN: %d MOVE: %s POSSIBLE_MOVES: %s NECK: %d,%d HEAD: %d,%d\n", request.Turn, response.Move, possibleMoves, neckX, neckY, headX, headY)
+	// fmt.Printf("TURN: %d MOVE: %s POSSIBLE_MOVES: %s NECK: %d,%d HEAD: %d,%d\n", request.Turn, response.Move, possibleMoves, neckX, neckY, headX, headY)
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
