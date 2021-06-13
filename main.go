@@ -60,10 +60,13 @@ type MoveResponse struct {
 // by play.battlesnake.com. BattlesnakeInfoResponse contains information about
 // your Battlesnake, including what it should look like on the game board.
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
+
+	blackCape := "#000000"
+
 	response := BattlesnakeInfoResponse{
 		APIVersion: "1",
-		Author:     "",        // TODO: Your Battlesnake username
-		Color:      "#888888", // TODO: Personalize
+		Author:     "dajomareyes", // TODO: Your Battlesnake username
+		Color:      blackCape,
 		Head:       "default", // TODO: Personalize
 		Tail:       "default", // TODO: Personalize
 	}
