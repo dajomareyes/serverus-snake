@@ -11,7 +11,7 @@ func HandleBoundaries(gameState GameRequest, possibleMoves *[]string) {
 	boardWidth = gameState.Board.Width - 1
 	boardHeight = gameState.Board.Height - 1
 
-	head := []int{gameState.You.Head.X, gameState.You.Head.Y}
+	head := gameState.You.Head
 
 	if isAtNorthernBoundary(head) {
 		removeMoveOption(possibleMoves, "up")
@@ -30,44 +30,34 @@ func HandleBoundaries(gameState GameRequest, possibleMoves *[]string) {
 	}
 }
 
-func isAtNorthernBoundary(head []int) bool {
-	nextMove := head[1] + 1
+func isAtNorthernBoundary(head Coord) bool {
+	nextMove := head.Y + 1
 	if nextMove == boardHeight {
 		return true
 	}
 	return false
 }
 
-func isAtSouthernBoundary(head []int) bool {
-	nextMove := head[1] - 1
+func isAtSouthernBoundary(head Coord) bool {
+	nextMove := head.Y - 1
 	if nextMove == 0 {
 		return true
 	}
 	return false
 }
 
-func isAtWesternBoundary(head []int) bool {
-	nextMove := head[0] - 1
+func isAtWesternBoundary(head Coord) bool {
+	nextMove := head.X - 1
 	if nextMove == 0 {
 		return true
 	}
 	return false
 }
 
-func isAtEasternBoundary(head []int) bool {
-	nextMove := head[0] + 1
+func isAtEasternBoundary(head Coord) bool {
+	nextMove := head.X + 1
 	if nextMove == boardWidth {
 		return true
 	}
 	return false
-}
-
-func removeMoveOption(possibleMoves *[]string, move string) {
-	moves := *possibleMoves
-	for i, m := range moves {
-		if m == move {
-			moves = append(moves[:i], moves[i+1:]...)
-		}
-	}
-	*possibleMoves = moves
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 
@@ -68,6 +69,9 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		this will cause the snake to turn too. This is a side affect of this logic.
 	*/
 	HandleBoundaries(request, &possibleMoves)
+	HandleObstacle(request, &possibleMoves)
+
+	move = possibleMoves[rand.Intn(len(possibleMoves))]
 
 	response := MoveResponse{
 		Move: move,
