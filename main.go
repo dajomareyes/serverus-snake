@@ -7,58 +7,14 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+
+	. "github.com/dajomareyes/serverus-snake/pkg/serverus"
 )
-
-type Game struct {
-	ID      string `json:"id"`
-	Timeout int32  `json:"timeout"`
-}
-
-type Coord struct {
-	X int `json:"x"`
-	Y int `json:"y"`
-}
-
-type Battlesnake struct {
-	ID     string  `json:"id"`
-	Name   string  `json:"name"`
-	Health int32   `json:"health"`
-	Body   []Coord `json:"body"`
-	Head   Coord   `json:"head"`
-	Length int32   `json:"length"`
-	Shout  string  `json:"shout"`
-}
-
-type Board struct {
-	Height int           `json:"height"`
-	Width  int           `json:"width"`
-	Food   []Coord       `json:"food"`
-	Snakes []Battlesnake `json:"snakes"`
-}
-
-type BattlesnakeInfoResponse struct {
-	APIVersion string `json:"apiversion"`
-	Author     string `json:"author"`
-	Color      string `json:"color"`
-	Head       string `json:"head"`
-	Tail       string `json:"tail"`
-}
-
-type GameRequest struct {
-	Game  Game        `json:"game"`
-	Turn  int         `json:"turn"`
-	Board Board       `json:"board"`
-	You   Battlesnake `json:"you"`
-}
-
-type MoveResponse struct {
-	Move  string `json:"move"`
-	Shout string `json:"shout,omitempty"`
-}
 
 // HandleIndex is called when your Battlesnake is created and refreshed
 // by play.battlesnake.com. BattlesnakeInfoResponse contains information about
 // your Battlesnake, including what it should look like on the game board.
+
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
 
 	blackCape := "#000000"
@@ -92,16 +48,6 @@ func HandleStart(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("START\n")
 }
 
-func removeMoveOption(possibleMoves *[]string, move string) {
-	moves := *possibleMoves
-	for i, m := range moves {
-		if m == move {
-			moves = append(moves[:i], moves[i+1:]...)
-		}
-	}
-	*possibleMoves = moves
-}
-
 // HandleMove is called for each turn of each game.
 // Valid responses are "up", "down", "left", or "right".
 // TODO: Use the information in the GameRequest object to determine your next move.
@@ -113,38 +59,19 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	// Common variables that will be used throughout the function
-	boardWidth := request.Board.Width - 1
-	boardHeight := request.Board.Height - 1
-	headX := request.You.Head.X
-	headY := request.You.Head.Y
-	neckX := request.You.Body[1].X
-	neckY := request.You.Body[1].Y
-
-	// Choose a random direction to move in
+	move := "up" // we default to up if we can't select a move
+	// possible moves that you can select
 	possibleMoves := []string{"up", "down", "left", "right"}
-	arrivedAtWall := headX == 0 || headX == boardWidth || headY == 0 || headY == boardHeight
 
-	move := "" // just go straight for now
+	/*
+		TODO: this process allows for us to change direction when we are at a wall
+		the problem right now is that if we're not moving towards the wall but running along side it
+		this will cause the snake to turn too. This is a side affect of this logic.
+	*/
+	HandleBoundaries(request, &possibleMoves)
+	HandleObstacle(request, &possibleMoves)
 
-	// Handle avoiding walls, then figure out how to handle corners
-	if arrivedAtWall {
-		// Use process of elimination to select move
-		if headY+1 > boardHeight || headY+1 == neckY {
-			removeMoveOption(&possibleMoves, "up")
-		}
-		if headY-1 < 0 || headY-1 == neckY {
-			removeMoveOption(&possibleMoves, "down")
-		}
-		if headX-1 < 0 || headX-1 == neckX {
-			removeMoveOption(&possibleMoves, "left")
-		}
-		if headX+1 > boardWidth || headX+1 == neckX {
-			removeMoveOption(&possibleMoves, "right")
-		}
-		// Select only valid moves
-		move = possibleMoves[rand.Intn(len(possibleMoves))]
-	}
+	move = possibleMoves[rand.Intn(len(possibleMoves))]
 
 	response := MoveResponse{
 		Move: move,
