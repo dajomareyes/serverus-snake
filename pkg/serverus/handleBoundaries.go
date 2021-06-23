@@ -38,20 +38,20 @@ func HandleBoundaries(gameState GameRequest, possibleMoves *[]string) {
 
 func isAtNorthernBoundary(head Coord) bool {
 	nextMove := head.Y + 1
-	return nextMove >= boardHeight
+	return nextMove > boardHeight
 }
 
 func isAtSouthernBoundary(head Coord) bool {
 	nextMove := head.Y - 1
-	return nextMove <= 0
+	return nextMove < 0
 }
 
 func isAtWesternBoundary(head Coord) bool {
 	nextMove := head.X - 1
-	return nextMove <= 0
+	return nextMove < 0
 }
 
 func isAtEasternBoundary(head Coord) bool {
 	nextMove := head.X + 1
-	return nextMove >= boardWidth
+	return nextMove > boardWidth
 }
