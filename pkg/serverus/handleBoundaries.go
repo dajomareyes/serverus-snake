@@ -1,5 +1,7 @@
 package serverus
 
+import "fmt"
+
 var boardWidth int
 var boardHeight int
 
@@ -7,9 +9,13 @@ var boardHeight int
 // Uses the current head location x,y and the boards limits to determine if the next move is possible
 // It does not return anything
 func HandleBoundaries(gameState GameRequest, possibleMoves *[]string) {
+	fmt.Println("IN HandleBoundaries")
+
 	// board dimensions should be offset by -1 to take into account 0 counting
 	boardWidth = gameState.Board.Width - 1
 	boardHeight = gameState.Board.Height - 1
+
+	fmt.Println(boardHeight, boardWidth)
 
 	head := gameState.You.Head
 
@@ -32,32 +38,20 @@ func HandleBoundaries(gameState GameRequest, possibleMoves *[]string) {
 
 func isAtNorthernBoundary(head Coord) bool {
 	nextMove := head.Y + 1
-	if nextMove == boardHeight {
-		return true
-	}
-	return false
+	return nextMove >= boardHeight
 }
 
 func isAtSouthernBoundary(head Coord) bool {
 	nextMove := head.Y - 1
-	if nextMove == 0 {
-		return true
-	}
-	return false
+	return nextMove <= 0
 }
 
 func isAtWesternBoundary(head Coord) bool {
 	nextMove := head.X - 1
-	if nextMove == 0 {
-		return true
-	}
-	return false
+	return nextMove <= 0
 }
 
 func isAtEasternBoundary(head Coord) bool {
 	nextMove := head.X + 1
-	if nextMove == boardWidth {
-		return true
-	}
-	return false
+	return nextMove >= boardWidth
 }
