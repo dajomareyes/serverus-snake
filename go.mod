@@ -2,4 +2,7 @@ module github.com/dajomareyes/serverus-snake
 
 go 1.16
 
-require github.com/BattlesnakeOfficial/rules v1.0.17 // indirect
+require (
+	github.com/BattlesnakeOfficial/rules v1.0.17 // indirect
+	github.com/stretchr/testify v1.7.0 // indirect
+)
