@@ -1,7 +1,5 @@
 package serverus
 
-import "fmt"
-
 var UP Coord = Coord{0, 1}
 var DOWN Coord = Coord{0, -1}
 var LEFT Coord = Coord{-1, 0}
@@ -9,7 +7,6 @@ var RIGHT Coord = Coord{1, 0}
 
 func HandleObstacle(gameState GameRequest, possibleMoves *[]string) {
 	// splice snake body to exclude the head
-	fmt.Println("IN HandleObstacle")
 	snakeBody := gameState.You.Body
 
 	var candidatesForRemoval []string
@@ -24,7 +21,6 @@ func HandleObstacle(gameState GameRequest, possibleMoves *[]string) {
 }
 
 func isObstacleSelf(move string, head Coord, snakeBody []Coord) bool {
-
 	var direction Coord
 
 	switch move {
@@ -42,7 +38,6 @@ func isObstacleSelf(move string, head Coord, snakeBody []Coord) bool {
 	nextMove := Coord{head.X + direction.X, head.Y + direction.Y}
 
 	// check if next move is in body
-	fmt.Printf("next move %s direction (%d): %d, snake body [%d]\n", move, direction, nextMove, snakeBody)
 	for _, node := range snakeBody {
 		if nextMove == node {
 			return true

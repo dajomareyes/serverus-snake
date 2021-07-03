@@ -21,7 +21,7 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 
 	response := BattlesnakeInfoResponse{
 		APIVersion: "1",
-		Author:     "dajomareyes", // TODO: Your Battlesnake username
+		Author:     "dajomareyes",
 		Color:      blackCape,
 		Head:       "default", // TODO: Personalize
 		Tail:       "default", // TODO: Personalize
@@ -82,6 +82,8 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	response := MoveResponse{
 		Move: move,
 	}
+
+	fmt.Println(request.You.ID, response)
 
 	// Send response
 	// fmt.Printf("TURN: %d MOVE: %s POSSIBLE_MOVES: %s NECK: %d,%d HEAD: %d,%d\n", request.Turn, response.Move, possibleMoves, neckX, neckY, headX, headY)
