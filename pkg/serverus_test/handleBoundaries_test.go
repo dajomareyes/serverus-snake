@@ -64,8 +64,8 @@ func TestHandleBoundaries(t *testing.T) {
 
 	for _, tt := range boundaryTests {
 		t.Run(fmt.Sprint(tt.title), func(t *testing.T) {
-			t.Parallel()
-			result := HandleBoundaries(setup(tt.head))
+			request, moves := setup(tt.head)
+			result := HandleBoundaries(request, moves)
 			assert.Equal(t, tt.expected, result)
 		})
 	}

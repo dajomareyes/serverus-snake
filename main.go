@@ -68,10 +68,11 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		the problem right now is that if we're not moving towards the wall but running along side it
 		this will cause the snake to turn too. This is a side affect of this logic.
 
-		HandleBoundaries & HandleObstacle both take a possible list of moves and remove moves that are not possible
+		HandleBoundaries & HandleObstacle both take a possible list of moves and updates the moves by removing
+		the ones that cannot be used
 	*/
-	HandleBoundaries(request, &possibleMoves)
-	HandleObstacle(request, &possibleMoves)
+	possibleMoves = HandleBoundaries(request, possibleMoves)
+	possibleMoves = HandleObstacle(request, possibleMoves)
 
 	if len(possibleMoves) > 0 {
 		move = possibleMoves[rand.Intn(len(possibleMoves))]

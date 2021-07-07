@@ -5,19 +5,20 @@ var DOWN Coord = Coord{0, -1}
 var LEFT Coord = Coord{-1, 0}
 var RIGHT Coord = Coord{1, 0}
 
-func HandleObstacle(gameState GameRequest, possibleMoves *[]string) {
+// returns a list of possible moves
+func HandleObstacle(gameState GameRequest, possibleMoves []string) []string {
 	// splice snake body to exclude the head
-	snakeBody := gameState.You.Body
-
 	var candidatesForRemoval []string
 
-	for _, move := range *possibleMoves {
-		if isObstacleSelf(move, gameState.You.Head, snakeBody) {
+	for _, move := range possibleMoves {
+		if isObstacleSelf(move, gameState.You.Head, gameState.You.Body) {
 			candidatesForRemoval = append(candidatesForRemoval, move)
 		}
 	}
 
-	removeMutlipleMoveOptions(possibleMoves, candidatesForRemoval)
+	removeMutlipleMoveOptions(&possibleMoves, candidatesForRemoval)
+
+	return possibleMoves
 }
 
 func isObstacleSelf(move string, head Coord, snakeBody []Coord) bool {
