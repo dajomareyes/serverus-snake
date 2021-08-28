@@ -11,7 +11,7 @@ func HandleObstacle(gameState GameRequest, possibleMoves []string) []string {
 	var candidatesForRemoval []string
 
 	for _, move := range possibleMoves {
-		if isObstacleSelf(move, gameState.You.Head, gameState.You.Body) {
+		if isObstacleSnake(move, gameState.You.Head, gameState.Board.Snakes) {
 			candidatesForRemoval = append(candidatesForRemoval, move)
 		}
 	}
@@ -21,29 +21,36 @@ func HandleObstacle(gameState GameRequest, possibleMoves []string) []string {
 	return possibleMoves
 }
 
-func isObstacleSelf(move string, head Coord, snakeBody []Coord) bool {
-	var direction Coord
+// TODO: Implement this function, since we are also in the list of battlesnake
+// it might make sense to just get rid of isObstacleSelf and just do
+// isObstacleSnake
+func isObstacleSnake(move string, head Coord, snakes []Battlesnake) bool {
+  // loop through all the 
+  var direction Coord
+  
+  switch move {
+  case "up":
+    direction = UP
+  case "down":
+    direction = DOWN
+  case "left":
+    direction = LEFT
+  case "right":
+    direction = RIGHT
+  }
 
-	switch move {
-	case "up":
-		direction = UP
-	case "down":
-		direction = DOWN
-	case "left":
-		direction = LEFT
-	case "right":
-		direction = RIGHT
-	}
+  nextMove := Coord{head.X + direction.X, head.Y + direction.Y}
 
-	// create next move
-	nextMove := Coord{head.X + direction.X, head.Y + direction.Y}
+  // for every battle snake in the game make sure the next move doesn't run
+  // into a part of their snake
+  for _, snake := range snakes {
+    for _, coordinate := range snake.Body {
+      if nextMove == coordinate {
+        // exit out of this for loop this move won't work
+        return true
+      }
+    }
+  }
 
-	// check if next move is in body
-	for _, node := range snakeBody {
-		if nextMove == node {
-			return true
-		}
-	}
-
-	return false
+  return false
 }
