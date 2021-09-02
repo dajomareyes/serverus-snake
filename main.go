@@ -50,7 +50,17 @@ func HandleStart(w http.ResponseWriter, r *http.Request) {
 
 // HandleMove is called for each turn of each game.
 // Valid responses are "up", "down", "left", or "right".
-// TODO: Use the information in the GameRequest object to determine your next move.
+
+// TODO: We've taught our snake how to avoid dying now we'll want to teach it
+// how to live, how to find food and implement strategies for it to survive
+//
+// Some nice things to have include some of the following:
+// - collect stats on our snake... things like
+//    - how often does the snake die to the wall? to another snake? to
+//    itself?
+//    - how long does our snake live on average? does that change with other
+//    snake on the board?
+
 func HandleMove(w http.ResponseWriter, r *http.Request) {
 	// Receive request
 	request := GameRequest{}
@@ -59,8 +69,9 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	move := "up" // we default to up if we can't select a move
-	// possible moves that you can select
+  // we default to up if we can't select a move
+	move := "up"
+  // possible moves that you can select
 	possibleMoves := []string{"up", "down", "left", "right"}
 
 	/*
@@ -87,7 +98,6 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(request.You.ID, response)
 
 	// Send response
-	// fmt.Printf("TURN: %d MOVE: %s POSSIBLE_MOVES: %s NECK: %d,%d HEAD: %d,%d\n", request.Turn, response.Move, possibleMoves, neckX, neckY, headX, headY)
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
