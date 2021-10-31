@@ -9,7 +9,20 @@ import (
 )
 
 func setupObstacleTest(snakeHead Coord, body []Coord) (GameRequest, []string) {
-	return GameRequest{You: Battlesnake{Head: snakeHead, Body: body}}, []string{"up", "down", "left", "right"}
+	var gameState GameRequest = GameRequest {
+		You: Battlesnake {
+			Head: snakeHead,
+			Body: body,
+		},
+		Board: Board {
+			Snakes: []Battlesnake{
+				Battlesnake {
+					Body: body,
+				},
+			},
+		},
+	}
+	return gameState, []string{"up", "down", "left", "right"}
 }
 
 func TestHandleObstacle(t *testing.T) {

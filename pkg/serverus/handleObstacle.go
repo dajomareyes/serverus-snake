@@ -5,9 +5,10 @@ var DOWN Coord = Coord{0, -1}
 var LEFT Coord = Coord{-1, 0}
 var RIGHT Coord = Coord{1, 0}
 
-// returns a list of possible moves
+// HandleObstacle returns a list of possible moves that could happen given
+// the state of the board and a list of possible moves. Takes mainly into account obstacles
+// like other snakes to decide possible moves
 func HandleObstacle(gameState GameRequest, possibleMoves []string) []string {
-	// splice snake body to exclude the head
 	var candidatesForRemoval []string
 
 	for _, move := range possibleMoves {
@@ -21,13 +22,14 @@ func HandleObstacle(gameState GameRequest, possibleMoves []string) []string {
 	return possibleMoves
 }
 
-// TODO: Implement this function, since we are also in the list of battlesnake
-// it might make sense to just get rid of isObstacleSelf and just do
-// isObstacleSnake
+
+// isObstacleSnake given the next possible move the coordinates of the head
+// and the locations of all the snakes on the board including the snake being
+// controlled will return whether the next possible move is valid or not
 func isObstacleSnake(move string, head Coord, snakes []Battlesnake) bool {
   // loop through all the 
   var direction Coord
-  
+
   switch move {
   case "up":
     direction = UP
