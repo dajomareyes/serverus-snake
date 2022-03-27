@@ -11,15 +11,15 @@ import (
 	. "github.com/dajomareyes/serverus-snake/pkg/serverus"
 )
 
+var logger *log.Logger
+
 // HandleIndex is called when your Battlesnake is created and refreshed
 // by play.battlesnake.com. BattlesnakeInfoResponse contains information about
 // your Battlesnake, including what it should look like on the game board.
-
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
-
 	blackCape := "#000000"
 
-	response := BattlesnakeInfoResponse{
+	response := BattlesnakeInfoResponse {
 		APIVersion: "1",
 		Author:     "dajomareyes",
 		Color:      blackCape,
@@ -30,78 +30,54 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(response)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal("Error handling Battlesnake index")
 	}
 }
 
 // HandleStart is called at the start of each game your Battlesnake is playing.
 // The GameRequest object contains information about the game that's about to start.
-// TODO: Use this function to decide how your Battlesnake is going to look on the board.
 func HandleStart(w http.ResponseWriter, r *http.Request) {
 	request := GameRequest{}
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal("Failed to start battlesnake!")
 	}
 
 	// Nothing to respond with here
-	fmt.Print("START\n")
+	logger.Print("START\n")
 }
 
 // HandleMove is called for each turn of each game.
 // Valid responses are "up", "down", "left", or "right".
-
-// TODO: We've taught our snake how to avoid dying now we'll want to teach it
-// how to live, how to find food and implement strategies for it to survive
-//
-// Some nice things to have include some of the following:
-// - collect stats on our snake... things like
-//    - how often does the snake die to the wall? to another snake? to
-//    itself?
-//    - how long does our snake live on average? does that change with other
-//    snake on the board?
-
 func HandleMove(w http.ResponseWriter, r *http.Request) {
-	// Receive request
 	request := GameRequest{}
+	possibleMoves := []string{"up", "down", "left", "right"}
+	move := "up"
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-  // we default to up if we can't select a move
-	move := "up"
-  // possible moves that you can select
-	possibleMoves := []string{"up", "down", "left", "right"}
-
-	/*
-		TODO: this process allows for us to change direction when we are at a wall
-		the problem right now is that if we're not moving towards the wall but running along side it
-		this will cause the snake to turn too. This is a side affect of this logic.
-
-		HandleBoundaries & HandleObstacle both take a possible list of moves and updates the moves by removing
-		the ones that cannot be used
-	*/
 	possibleMoves = HandleBoundaries(request, possibleMoves)
 	possibleMoves = HandleObstacle(request, possibleMoves)
 
 	if len(possibleMoves) > 0 {
 		move = possibleMoves[rand.Intn(len(possibleMoves))]
 	} else {
-		fmt.Println("You're trapped... goodbye")
+		logger.Println("Death is imminent... goodbye", request.You.Name)
 	}
 
 	response := MoveResponse{
 		Move: move,
 	}
 
-	fmt.Println(request.You.ID, response)
+	logger.Println("Next move for", request.You.Name, "is", response)
 
 	// Send response
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
-		log.Fatal(err)
+		logger.Println("Failed to send response data")
 	}
 }
 
@@ -119,6 +95,8 @@ func HandleEnd(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	logger = log.New(os.Stdout, "[Main] - ", 5)
+
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
 		port = "8080"
@@ -129,6 +107,6 @@ func main() {
 	http.HandleFunc("/move", HandleMove)
 	http.HandleFunc("/end", HandleEnd)
 
-	fmt.Printf("Starting Battlesnake Server at http://0.0.0.0:%s...\n", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	logger.Printf("Starting Battlesnake Server at http://0.0.0.0:%s...\n", port)
+	logger.Fatal(http.ListenAndServe(":"+port, nil))
 }
