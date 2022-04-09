@@ -1,3 +1,3 @@
 # serverus-snake
-battlesnake training grounds
+battlesnake training grounds - snakey snakey
 
